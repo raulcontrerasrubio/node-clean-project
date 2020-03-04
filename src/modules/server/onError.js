@@ -1,4 +1,4 @@
-const onError = error => {
+const onError = (error, port) => {
   if (error.syscall !== 'listen') {
     throw error;
   }

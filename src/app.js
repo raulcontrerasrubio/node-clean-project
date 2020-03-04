@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 
-require('dotenv').config();
+require('dotenv-extended').load({
+  errorOnMissing: true,
+});
 const path = require('path');
 const http = require('http');
 const express = require('express');
 require('debug')('node-clean-project:server');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const bodyParser = require('body-parser');
 
 const onListening = require('./modules/server/onListening');
 const onError = require('./modules/server/onError');
@@ -24,6 +27,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /**
@@ -80,7 +84,7 @@ app.set('port', port);
 const server = http.createServer(app);
 
 server.listen(port);
-server.on('error', onError);
+server.on('error', error => onError(error, port));
 server.on('listening', () => onListening(server));
 
 module.exports = app;
