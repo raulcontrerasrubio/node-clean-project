@@ -1,12 +1,14 @@
 {
-  "name": "tarjeat-server",
-  "version": "0.0.0",
+  "name": "node-clean-project",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "check-package-manager": "node -e \"!process.env.npm_config_user_agent.startsWith('npm/') && !console.log('---- USE NPM TO INSTALL DEPENDENCIES ----') && process.exit(1)\"",
     "preinstall": "npm run check-package-manager --silent",
     "start-dev": "nodemon ./src/app.js",
-    "start": "node ./src/app.js"
+    "start": "cross-env NODE_ENV=production node ./src/app.js",
+    "test-unit": "cross-env NODE_ENV=test-unit mocha test/unit/**/*.test.js --watch",
+    "test-integration": "cross-env NODE_ENV=test-integration mocha test/integration/**/*.test.js --watch"
   },
   "husky": {
     "hooks": {
@@ -14,20 +16,28 @@
     }
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
+    "dotenv-extended": "^2.7.1",
     "express": "~4.16.1",
     "morgan": "~1.9.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "cross-env": "^7.0.1",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-mocha": "^6.3.0",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.3",
+    "mocha": "^7.1.0",
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
-    "pretty-quick": "^2.0.1"
+    "pretty-quick": "^2.0.1",
+    "sinon": "^9.0.0"
   }
 }

@@ -3,12 +3,14 @@
     "browser": true,
     "commonjs": true,
     "es6": true,
-    "node": true
+    "node": true,
+    "mocha": true
   },
   "plugins": [
-    "prettier"
+    "prettier",
+    "mocha"
   ],
-  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:mocha/recommended"],
   "parser": "babel-eslint",
   "parserOptions": {
     "sourceType": "module",
