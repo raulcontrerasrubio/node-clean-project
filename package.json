@@ -5,7 +5,8 @@
   "scripts": {
     "check-package-manager": "node -e \"!process.env.npm_config_user_agent.startsWith('npm/') && !console.log('---- USE NPM TO INSTALL DEPENDENCIES ----') && process.exit(1)\"",
     "preinstall": "npm run check-package-manager --silent",
-    "start": "node ./app.js"
+    "start-dev": "nodemon ./src/app.js",
+    "start": "node ./src/app.js"
   },
   "husky": {
     "hooks": {
@@ -25,6 +26,7 @@
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.3",
+    "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1"
   }

@@ -4,7 +4,7 @@ require('dotenv').config();
 const path = require('path');
 const http = require('http');
 const express = require('express');
-require('debug')('tarjeat-server:server');
+require('debug')('node-clean-project:server');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 

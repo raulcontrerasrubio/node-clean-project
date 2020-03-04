@@ -1,24 +1,21 @@
-# Tarjeat Server
+# Node Clean Project
 
-Servidor para Tarjeat.
+A initial NodeJS project already configured
 
-## Tecnologías
+## Enviroment variables
 
-Elastic Beanstalk
-
-- Load Balancer (SSL): POR HACER
-- Node: v12.16.1
-- RDS MySQL: POR HACER
-
-## Variables de entorno
+- Create a `.env` file with the following content:
 
 ```
-DEBUG=tarjeat-server:*
-PORT=5000
+NODE_ENV=
+DEBUG=
+PORT=
 ```
 
-## Empezar proyecto
+## Getting started
 
-> Solo se puede utilizar npm para instalar las dependencias
+> Only npm is allowed to install the dependencies
 
-Color: #C02137
+1. Create the `.env` file with the needed keys
+2. Run `npm run start-dev` to init the project with nodemon
+3. Run `npm start` to init the project without nodemon
