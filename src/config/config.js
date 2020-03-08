@@ -1,5 +1,6 @@
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
+const mysqlConnection = require('../modules/database/sequelize');
 const sessionStore = new MySQLStore({}, mysqlConnection);
 
 const CORS_OPTIONS = {

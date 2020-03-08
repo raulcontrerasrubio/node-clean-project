@@ -23,6 +23,7 @@ const indexRouter = require('./routes/index');
 
 const app = express();
 require('./passport/index')(app);
+const models = require('./modules/database/models/index');
 
 /**
  * MIDDLEWARES
@@ -92,8 +93,15 @@ const port = normalizePort(process.env.PORT || '5000');
 app.set('port', port);
 const server = http.createServer(app);
 
-server.listen(port);
-server.on('error', error => onError(error, port));
-server.on('listening', () => onListening(server));
+models.sequelize
+  .sync()
+  .then(() => {
+    server.listen(port);
+    server.on('error', error => onError(error, port));
+    server.on('listening', () => onListening(server, models.sequelize));
+  })
+  .catch(() => {
+    console.log('Error synchronizing the database');
+  });
 
 module.exports = app;
