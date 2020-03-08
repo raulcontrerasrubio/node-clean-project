@@ -7,6 +7,11 @@ const express = require('express');
 require('debug')('node-clean-project:server');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const flash = require('connect-flash');
+
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const {CORS_OPTIONS, HEADERS_CONFIG, SESSION_MIDDLEWARE} = require('./config/config');
 
 const onListening = require('./modules/server/onListening');
 const onError = require('./modules/server/onError');
@@ -15,16 +20,22 @@ const normalizePort = require('./modules/server/normalizePort');
 const indexRouter = require('./routes/index');
 
 const app = express();
+require('./passport/index')(app);
 
 /**
  * MIDDLEWARES
  */
-
+app.use(cors(CORS_OPTIONS));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(HEADERS_CONFIG);
+app.use(SESSION_MIDDLEWARE);
+app.use(flash());
+require('./passport')(app);
 
 /**
  * ROUTES
