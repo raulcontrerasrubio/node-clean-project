@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-require('dotenv').config();
+require('dotenv-extended').load({
+  errorOnMissing: true,
+});
 const path = require('path');
 const http = require('http');
 const express = require('express');
@@ -91,7 +93,7 @@ app.set('port', port);
 const server = http.createServer(app);
 
 server.listen(port);
-server.on('error', onError);
+server.on('error', error => onError(error, port));
 server.on('listening', () => onListening(server));
 
 module.exports = app;
