@@ -9,32 +9,51 @@ const express = require('express');
 require('debug')('node-clean-project:server');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const flash = require('connect-flash'); //
+
 const bodyParser = require('body-parser');
+const cors = require('cors');
+const {CORS_OPTIONS, HEADERS_CONFIG} = require('./config/config');
+const passport = require('./config/passport');
 
 const onListening = require('./modules/server/onListening');
 const onError = require('./modules/server/onError');
 const normalizePort = require('./modules/server/normalizePort');
 
 const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
 
 const app = express();
+const models = require('./database/models');
 
 /**
  * MIDDLEWARES
  */
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(logger('dev'));
+app.use(cors(CORS_OPTIONS));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(HEADERS_CONFIG);
+app.use(
+  require('express-session')({
+    secret: 'Super.node secret-session',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(flash()); //
+passport(app);
 
 /**
  * ROUTES
  */
 
 app.use('/', indexRouter);
+app.use('/auth', authRouter);
 
 /**
  * ERROR HANDLING
@@ -85,6 +104,6 @@ const server = http.createServer(app);
 
 server.listen(port);
 server.on('error', error => onError(error, port));
-server.on('listening', () => onListening(server));
+server.on('listening', () => onListening(server, models.sequelize));
 
 module.exports = app;

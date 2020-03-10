@@ -18,7 +18,10 @@ describe('onListening test suite', function() {
     const server = {
       address: () => '5000',
     };
-    const result = onListening(server);
+    const sequelize = {
+      authenticate: () => Promise.resolve(),
+    };
+    const result = onListening(server, sequelize);
     expect(result).to.be.undefined;
   });
 
@@ -26,7 +29,10 @@ describe('onListening test suite', function() {
     const server = {
       address: () => '5000',
     };
-    onListening(server);
+    const sequelize = {
+      authenticate: () => Promise.resolve(),
+    };
+    onListening(server, sequelize);
     expect(spy.lastCall.lastArg.includes('pipe')).to.be.true;
   });
 
@@ -34,7 +40,10 @@ describe('onListening test suite', function() {
     const server = {
       address: () => 5000,
     };
-    onListening(server);
+    const sequelize = {
+      authenticate: () => Promise.resolve(),
+    };
+    onListening(server, sequelize);
 
     expect(spy.lastCall.lastArg.includes('port')).to.be.true;
   });

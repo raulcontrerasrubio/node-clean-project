@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "db-init": "node ./src/scripts/createInitialTables",
     "check-package-manager": "node -e \"!process.env.npm_config_user_agent.startsWith('npm/') && !console.log('---- USE NPM TO INSTALL DEPENDENCIES ----') && process.exit(1)\"",
     "preinstall": "npm run check-package-manager --silent",
     "start-dev": "nodemon ./src/app.js",
@@ -16,13 +17,26 @@
     }
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
-    "cookie-parser": "~1.4.4",
+    "connect-ensure-login": "^0.1.1",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
     "dotenv-extended": "^2.7.1",
     "express": "~4.16.1",
-    "morgan": "~1.9.1"
+    "express-session": "^1.17.0",
+    "express-session-sequelize": "^2.2.0",
+    "isemail": "^3.2.0",
+    "moment": "^2.24.0",
+    "morgan": "~1.9.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.1.0",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "sequelize": "^5.21.5"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
@@ -38,6 +52,7 @@
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
+    "sequelize-auto-migrations": "^1.0.3",
     "sinon": "^9.0.0"
   }
 }
