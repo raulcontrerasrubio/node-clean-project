@@ -3,6 +3,7 @@ const sendError = (error, res) => {
   res.status(500).json({
     message: 'Internal Server Error',
   });
+  return null;
 };
 
 module.exports = sendError;
