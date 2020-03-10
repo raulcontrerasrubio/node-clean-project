@@ -9,7 +9,8 @@ const express = require('express');
 require('debug')('node-clean-project:server');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const flash = require('connect-flash'); //
+const session = require('express-session');
+const SessionStore = require('express-session-sequelize')(session.Store);
 
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -25,6 +26,9 @@ const authRouter = require('./routes/auth');
 
 const app = express();
 const models = require('./database/models');
+const sequelizeSessionStore = new SessionStore({
+  db: models.sequelize,
+});
 
 /**
  * MIDDLEWARES
@@ -39,13 +43,13 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(HEADERS_CONFIG);
 app.use(
-  require('express-session')({
+  session({
     secret: 'Super.node secret-session',
     resave: false,
     saveUninitialized: false,
+    store: sequelizeSessionStore,
   })
 );
-app.use(flash()); //
 passport(app);
 
 /**
@@ -62,36 +66,34 @@ app.use('/auth', authRouter);
 app.use((req, res) => {
   res.status(req.status || 404);
   if (req.accepts('html')) {
-    res.sendFile(path.join(__dirname + '/public/404.html'));
-    return;
+    return res.sendFile(path.join(__dirname + '/public/404.html'));
   }
 
   if (req.accepts('json')) {
-    res.json({
+    return res.json({
       code: 404,
       message: 'Page not found',
     });
   }
 
-  res.type('txt').send('Page not found');
+  return res.type('txt').send('Page not found');
 });
 
 app.use((error, req, res) => {
   console.log(error);
   res.status(req.status || 500);
   if (req.accepts('html')) {
-    res.sendFile(path.join(__dirname + '/public/500.html'));
-    return;
+    return res.sendFile(path.join(__dirname + '/public/500.html'));
   }
 
   if (req.accepts('json')) {
-    res.json({
+    return res.json({
       code: 500,
       message: 'Internal Server Error',
     });
   }
 
-  res.type('txt').send('Internal Server Error');
+  return res.type('txt').send('Internal Server Error');
 });
 
 /**

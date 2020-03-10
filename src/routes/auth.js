@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
       return res.status(200).json(user);
     });
   } catch (error) {
-    server.sendError(error, res);
+    return server.sendError(error, res);
   }
 });
 
@@ -71,6 +71,12 @@ router.post('/signup', async (req, res) => {
 
     const user = await auth.localSignup(email, password);
 
+    if (!user) {
+      return res.status(400).json({
+        message: 'Email already exists',
+      });
+    }
+
     return req.login(user, error => {
       if (error) {
         throw new Error(error);
@@ -79,7 +85,7 @@ router.post('/signup', async (req, res) => {
       return res.status(200).json(user);
     });
   } catch (error) {
-    server.sendError(error, res);
+    return server.sendError(error, res);
   }
 });
 

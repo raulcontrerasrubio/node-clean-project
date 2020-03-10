@@ -10,20 +10,24 @@ module.exports = app => {
   passport.use(
     'local',
     new LocalStrategy(async (email, password, done) => {
-      const user = await User.findOne({
-        where: {
-          email,
-        },
-      });
-      if (!user) {
-        return done(null, false, {message: 'The email provided does not exist'});
-      }
+      try {
+        const user = await User.findOne({
+          where: {
+            email,
+          },
+        });
+        if (!user) {
+          return done(null, false, {message: 'The email provided does not exist'});
+        }
 
-      if (bcrypt.compareSync(password, user.password)) {
-        return done(null, user);
-      }
+        if (bcrypt.compareSync(password, user.password)) {
+          return done(null, user);
+        }
 
-      return done(null, false, {message: 'The password is not correct.'});
+        return done(null, false, {message: 'The password is not correct.'});
+      } catch (error) {
+        throw new Error(error);
+      }
     })
   );
 
@@ -32,15 +36,21 @@ module.exports = app => {
   });
 
   passport.deserializeUser(async (id, done) => {
-    const user = await User.findOne({
-      where: {
-        id,
-      },
-    });
-    if (!user) {
-      done(new Error('Bad user.'));
-    }
+    try {
+      const user = await User.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!user) {
+        done(new Error('Bad user.'));
+        return null;
+      }
 
-    done(null, user);
+      done(null, user);
+      return null;
+    } catch (error) {
+      throw new Error(error);
+    }
   });
 };
