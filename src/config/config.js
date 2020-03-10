@@ -1,7 +1,9 @@
 const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
-const mysqlConnection = require('../modules/database/sequelize');
-const sessionStore = new MySQLStore({}, mysqlConnection);
+const SessionStore = require('express-session-sequelize')(session.Store);
+const {sequelize} = require('../database/models');
+const sequelizeSessionStore = new SessionStore({
+  db: sequelize,
+});
 
 const CORS_OPTIONS = {
   origin: true,
@@ -18,9 +20,9 @@ const HEADERS_CONFIG = (req, res, next) => {
 
 const SESSION_CONFIG = {
   secret: 'web-app-session-secret',
-  resave: true,
-  saveUninitialized: true,
-  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  store: sequelizeSessionStore,
 };
 
 const SESSION_MIDDLEWARE = session(SESSION_CONFIG);
