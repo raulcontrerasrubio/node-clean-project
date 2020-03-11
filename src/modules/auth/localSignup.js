@@ -1,5 +1,7 @@
 const bcrypt = require('bcryptjs');
 const {User} = require('../../database/models');
+const {v4: uuidv4} = require('uuid');
+const sendConfirmationEmail = require('./sendConfirmationEmail');
 
 const localSignup = async (email, password) => {
   try {
@@ -14,11 +16,18 @@ const localSignup = async (email, password) => {
     }
 
     const parsedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+    const token = uuidv4();
 
     const user = await User.create({
-      email: email,
+      email,
       password: parsedPassword,
+      token,
+      confirmed: !+process.env.REQUIRE_EMAIL_CONFIRMATION,
     });
+
+    if (+process.env.REQUIRE_EMAIL_CONFIRMATION) {
+      await sendConfirmationEmail(email, token);
+    }
 
     return user;
   } catch (error) {
