@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
     },
+    token: {
+      type: DataTypes.STRING,
+    },
+    confirmed: {
+      type: DataTypes.BOOLEAN,
+    },
   });
 
   return User;
