@@ -1,10 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const auth = require('../modules/auth/index');
+const user = require('express').Router();
 
-/* GET home page. */
-router.get('/', auth.ensureLoggedIn, (req, res) => {
-  res.status(200).json({working: true});
-});
+const authRouter = require('./auth');
 
-module.exports = router;
+user.use('/auth', authRouter);
+
+module.exports = user;

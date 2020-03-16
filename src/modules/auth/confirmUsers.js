@@ -1,12 +1,17 @@
-const bcrypt = require('bcryptjs');
+const {v4: uuidv4} = require('uuid');
 const {VALID_TYPE_USERS, USER} = require('../../config/config');
 const {User} = require('../../database/models');
 
-const localLogin = async (email, password, type) => {
+const confirmUser = async (id, token, type) => {
   try {
+    if (!id || !token) {
+      throw new Error('The id and the token are required');
+    }
+
     if (!VALID_TYPE_USERS.includes(type)) {
       throw new Error('The user type is not valid');
     }
+
     let Model;
     switch (type) {
       case USER:
@@ -16,26 +21,24 @@ const localLogin = async (email, password, type) => {
         throw new Error('The user type is not valid');
     }
 
-    const account = await Model.findOne({
-      where: {
-        email,
+    const result = await Model.update(
+      {
+        confirmed: true,
+        token: uuidv4(),
       },
-    });
+      {
+        where: {
+          id,
+          token,
+          confirmed: false,
+        },
+      }
+    );
 
-    if (!account) {
-      return null;
-    }
-
-    const isPasswordValid = bcrypt.compareSync(password, account.password);
-
-    if (!isPasswordValid) {
-      return null;
-    }
-
-    return account;
+    return result;
   } catch (error) {
     throw new Error(error);
   }
 };
 
-module.exports = localLogin;
+module.exports = confirmUser;

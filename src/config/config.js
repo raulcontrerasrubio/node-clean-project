@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 const CORS_OPTIONS = {
   origin: true,
   credentials: true,
@@ -12,11 +14,14 @@ const HEADERS_CONFIG = (req, res, next) => {
 };
 
 const USER = 'user';
-const VALID_USER_TYPES = [USER];
+const VALID_TYPE_USERS = [USER];
+
+const PASSWORD_SALT = bcrypt.genSaltSync(10);
 
 module.exports = {
   CORS_OPTIONS,
   HEADERS_CONFIG,
+  VALID_TYPE_USERS,
   USER,
-  VALID_USER_TYPES,
+  PASSWORD_SALT,
 };
