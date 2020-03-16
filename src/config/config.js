@@ -11,7 +11,12 @@ const HEADERS_CONFIG = (req, res, next) => {
   next();
 };
 
+const USER = 'user';
+const VALID_USER_TYPES = [USER];
+
 module.exports = {
   CORS_OPTIONS,
   HEADERS_CONFIG,
+  USER,
+  VALID_USER_TYPES,
 };
