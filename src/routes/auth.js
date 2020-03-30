@@ -1,11 +1,11 @@
 const Auth = require('express').Router();
 
 const isEmail = require('isemail');
-const {USER} = require('../../config/config');
-const setEntity = require('../../passport/setEntity');
+const {USER} = require('../config/config');
+const setEntity = require('../passport/setEntity');
 
-const auth = require('../../modules/auth/index');
-const server = require('../../modules/server/index');
+const auth = require('../modules/auth/index');
+const server = require('../modules/server/index');
 
 Auth.get('/is-authenticated', auth.ensureLoggedIn(USER), (req, res) => {
   res.status(200).json(req.user);

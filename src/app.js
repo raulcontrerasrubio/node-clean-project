@@ -64,6 +64,7 @@ passport.use('user-local', userStrategy);
  */
 
 app.use('/', indexRouter);
+app.use('/auth', authRouter);
 
 /**
  * ERROR HANDLING

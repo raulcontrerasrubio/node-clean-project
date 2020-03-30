@@ -1,7 +1,13 @@
-const user = require('express').Router();
+const router = require('express').Router();
 
 const authRouter = require('./auth');
 
-user.use('/auth', authRouter);
+router.get('/not-authorized', (req, res) => {
+  return res.status(403).json({
+    message: 'Access denied',
+  });
+});
 
-module.exports = user;
+router.use('/auth', authRouter);
+
+module.exports = router;
