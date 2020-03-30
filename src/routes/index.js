@@ -1,5 +1,11 @@
-/**
+/** Root routes
  * @module routes
+ */
+
+/**
+ * @type {object}
+ * @description Route /
+ * @const
  * @namespace /
  */
 const router = require('express').Router();
@@ -9,7 +15,7 @@ const authRouter = require('./auth');
 /**
  * @name Access denied
  * @description Indicates that the access is denied
- * @memberof module:routes./
+ * @memberof module:routes~/
  * @path {GET} /not-authorized
  * @code {403} Access denied
  * @response {Object} 403:
