@@ -1,3 +1,11 @@
+/**
+ * @name normalizePort
+ * @description Returns a normalized port
+ * @memberof module:Server
+ * @function
+ * @param {string} val Value to normalize
+ * @returns {number|boolean} Normalized port or false if val is not a valid number
+ */
 const normalizePort = val => {
   const port = parseInt(val, 10);
 

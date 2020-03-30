@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: routes/index.js</title>
+    <title>JSDoc: Source: modules/server/onError.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: routes/index.js</h1>
+    <h1 class="page-title">Source: modules/server/onError.js</h1>
 
     
 
@@ -26,38 +26,34 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** Root routes
- * @module routes
+            <pre class="prettyprint source linenums"><code>/**
+ * @name onError
+ * @description Function called when node detects an error
+ * @memberof module:Server
+ * @function
+ * @param {*} error 
+ * @param {*} port 
  */
+const onError = (error, port) => {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
 
-/**
- * @type {object}
- * @description Route /
- * @const
- * @namespace /
- */
-const router = require('express').Router();
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
-const authRouter = require('./auth');
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      return process.exit(1);
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      return process.exit(1);
+    default:
+      throw error;
+  }
+};
 
-/**
- * @name Access denied
- * @description Indicates that the access is denied
- * @memberof module:routes~/
- * @path {GET} /not-authorized
- * @code {403} Access denied
- * @response {Object} 403:
- * @response {string} message Response message
- */
-router.get('/not-authorized', (req, res) => {
-  return res.status(403).json({
-    message: 'Access denied',
-  });
-});
-
-router.use('/auth', authRouter);
-
-module.exports = router;
+module.exports = onError;
 </code></pre>
         </article>
     </section>

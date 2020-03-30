@@ -1,3 +1,7 @@
+/**
+ * @module Server
+ */
+
 const sendError = require('./sendError');
 const normalizePort = require('./normalizePort');
 const onError = require('./onError');

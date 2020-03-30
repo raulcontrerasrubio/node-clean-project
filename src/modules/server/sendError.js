@@ -1,9 +1,16 @@
+/**
+ * @name sendError
+ * @description Returns a 500 response
+ * @memberof module:Server
+ * @function
+ * @param {*} error
+ * @param {*} res
+ */
 const sendError = (error, res) => {
   console.log(error);
-  res.status(500).json({
+  return res.status(500).json({
     message: 'Internal Server Error',
   });
-  return null;
 };
 
 module.exports = sendError;
