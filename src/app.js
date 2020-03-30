@@ -15,7 +15,10 @@ const SessionStore = require('express-session-sequelize')(session.Store);
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const {CORS_OPTIONS, HEADERS_CONFIG} = require('./config/config');
-const passport = require('./config/passport');
+const passport = require('passport');
+const {userStrategy} = require('./passport/strategies');
+const deserialize = require('./passport/deserialize');
+const serialize = require('./passport/serialize');
 
 const onListening = require('./modules/server/onListening');
 const onError = require('./modules/server/onError');
@@ -50,7 +53,11 @@ app.use(
     store: sequelizeSessionStore,
   })
 );
-passport(app);
+app.use(passport.initialize());
+app.use(passport.session());
+passport.serializeUser(serialize);
+passport.deserializeUser(deserialize);
+passport.use('user-local', userStrategy);
 
 /**
  * ROUTES

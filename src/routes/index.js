@@ -1,10 +1,13 @@
-const express = require('express');
-const router = express.Router();
-const auth = require('../modules/auth/index');
+const router = require('express').Router();
 
-/* GET home page. */
-router.get('/', auth.ensureLoggedIn, (req, res) => {
-  res.status(200).json({working: true});
+const authRouter = require('./auth');
+
+router.get('/not-authorized', (req, res) => {
+  return res.status(403).json({
+    message: 'Access denied',
+  });
 });
+
+router.use('/auth', authRouter);
 
 module.exports = router;
