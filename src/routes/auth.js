@@ -32,6 +32,15 @@ Auth.get('/is-authenticated', auth.ensureLoggedIn(USER), (req, res) => {
   res.status(200).json(req.user);
 });
 
+/**
+ * @name Log out
+ * @description Closes the user's session
+ * @path {GET} /auth/logout
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @response {Object} 200:
+ * @response {string} message
+ */
 Auth.get('/logout', (req, res) => {
   const loggedOut = auth.logout(req, USER);
   if (loggedOut) {
@@ -44,6 +53,22 @@ Auth.get('/logout', (req, res) => {
   });
 });
 
+/**
+ * @name Confirm user account
+ * @description Confirms a user account
+ * @path {GET} /auth/confirm
+ * @memberof module:routes~/auth
+ * @body id {string} Id of the user
+ * @body token {string} Token of the user
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200: Entity
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
 Auth.post('/confirm', async (req, res) => {
   try {
     const {id, token} = req.body;
@@ -76,6 +101,22 @@ Auth.post('/confirm', async (req, res) => {
   }
 });
 
+/**
+ * @name Login
+ * @description Creates a user session
+ * @path {GET} /auth/login
+ * @memberof module:routes~/auth
+ * @body email {string} User's email
+ * @body password {string} User's password
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200: Entity
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
 Auth.post('/login', async (req, res) => {
   try {
     const {email, password} = req.body;
@@ -113,6 +154,22 @@ Auth.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * @name Signup
+ * @description Creates a user account
+ * @body email {string} Email of the user
+ * @body password {string} Password of the user
+ * @path {GET} /auth/signup
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200: Entity
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
 Auth.post('/signup', async (req, res) => {
   try {
     const {email, password} = req.body;
@@ -159,6 +216,22 @@ Auth.post('/signup', async (req, res) => {
   }
 });
 
+/**
+ * @name Send recovery email
+ * @body email {string} Email of the user to request a password change
+ * @description Sends a recovery password email
+ * @path {GET} /auth/send-recovery-email
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200:
+ * @response {string} message Success message
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
 Auth.post('/send-recovery-email', async (req, res) => {
   try {
     const {email} = req.body;
@@ -195,6 +268,25 @@ Auth.post('/send-recovery-email', async (req, res) => {
   }
 });
 
+/**
+ * @name Reset password
+ * @body id {string} User id
+ * @body token {string} User token
+ * @body password {string} User password
+ * @body confirmPassword {string} Confirmation of the password
+ * @description Resets a user password
+ * @path {GET} /auth/reset-password
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200:
+ * @response {string} message Success message
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
 Auth.post('/reset-password', async (req, res) => {
   try {
     const {id, token, password, confirmPassword} = req.body;

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: routes/index.js</title>
+    <title>JSDoc: Source: modules/auth/logout.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: routes/index.js</h1>
+    <h1 class="page-title">Source: modules/auth/logout.js</h1>
 
     
 
@@ -26,38 +26,23 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** Root routes
- * @module routes
+            <pre class="prettyprint source linenums"><code>/**
+ * @name logout
+ * @function
+ * @memberof module:Auth
+ * @description Closes the user session
+ * @param {Object} req Express req object
+ * @param {string} type User type
  */
+const logout = (req, type) => {
+  if (req.user &amp;&amp; req.user.type === type) {
+    req.logout();
+    return true;
+  }
+  return false;
+};
 
-/**
- * @type {object}
- * @description Route /
- * @const
- * @namespace /
- */
-const router = require('express').Router();
-
-const authRouter = require('./auth');
-
-/**
- * @name Access denied
- * @description Indicates that the access is denied
- * @memberof module:routes~/
- * @path {GET} /not-authorized
- * @code {403} Access denied
- * @response {Object} 403:
- * @response {string} message Response message
- */
-router.get('/not-authorized', (req, res) => {
-  return res.status(403).json({
-    message: 'Access denied',
-  });
-});
-
-router.use('/auth', authRouter);
-
-module.exports = router;
+module.exports = logout;
 </code></pre>
         </article>
     </section>

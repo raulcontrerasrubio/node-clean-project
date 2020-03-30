@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: routes/index.js</title>
+    <title>JSDoc: Source: modules/auth/ensureLoggedIn.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: routes/index.js</h1>
+    <h1 class="page-title">Source: modules/auth/ensureLoggedIn.js</h1>
 
     
 
@@ -26,38 +26,29 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** Root routes
- * @module routes
+            <pre class="prettyprint source linenums"><code>/**
+ * @name ensureLoggedIn
+ * @function
+ * @memberof module:Auth
+ * @description Checks if the user is logged with a concrete type
+ * @param {string} type User's type
  */
+const ensureLoggedIn = type => {
+  if (!type) {
+    throw new Error('The auth type is required');
+  }
+  const _type = type;
 
-/**
- * @type {object}
- * @description Route /
- * @const
- * @namespace /
- */
-const router = require('express').Router();
+  return (req, res, next) => {
+    if (req.isAuthenticated() &amp;&amp; req.user.type === _type) {
+      return next(null);
+    }
+    res.redirect('/not-authorized');
+    return null;
+  };
+};
 
-const authRouter = require('./auth');
-
-/**
- * @name Access denied
- * @description Indicates that the access is denied
- * @memberof module:routes~/
- * @path {GET} /not-authorized
- * @code {403} Access denied
- * @response {Object} 403:
- * @response {string} message Response message
- */
-router.get('/not-authorized', (req, res) => {
-  return res.status(403).json({
-    message: 'Access denied',
-  });
-});
-
-router.use('/auth', authRouter);
-
-module.exports = router;
+module.exports = ensureLoggedIn;
 </code></pre>
         </article>
     </section>

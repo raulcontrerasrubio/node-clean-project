@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: routes/index.js</title>
+    <title>JSDoc: Source: modules/auth/localLogin.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: routes/index.js</h1>
+    <h1 class="page-title">Source: modules/auth/localLogin.js</h1>
 
     
 
@@ -26,38 +26,57 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** Root routes
- * @module routes
- */
+            <pre class="prettyprint source linenums"><code>const bcrypt = require('bcryptjs');
+const {VALID_TYPE_USERS, USER} = require('../../config/config');
+const {User} = require('../../database/models');
 
 /**
- * @type {object}
- * @description Route /
- * @const
- * @namespace /
+ * @name localLogin
+ * @function
+ * @async
+ * @memberof module:Auth
+ * @description Initializes a user's session
+ * @param {string} email User's email
+ * @param {string} password User's password
+ * @param {string} type User's type
  */
-const router = require('express').Router();
+const localLogin = async (email, password, type) => {
+  try {
+    if (!VALID_TYPE_USERS.includes(type)) {
+      throw new Error('The user type is not valid');
+    }
+    let Model;
+    switch (type) {
+      case USER:
+        Model = User;
+        break;
+      default:
+        throw new Error('The user type is not valid');
+    }
 
-const authRouter = require('./auth');
+    const account = await Model.findOne({
+      where: {
+        email,
+      },
+    });
 
-/**
- * @name Access denied
- * @description Indicates that the access is denied
- * @memberof module:routes~/
- * @path {GET} /not-authorized
- * @code {403} Access denied
- * @response {Object} 403:
- * @response {string} message Response message
- */
-router.get('/not-authorized', (req, res) => {
-  return res.status(403).json({
-    message: 'Access denied',
-  });
-});
+    if (!account) {
+      return null;
+    }
 
-router.use('/auth', authRouter);
+    const isPasswordValid = bcrypt.compareSync(password, account.password);
 
-module.exports = router;
+    if (!isPasswordValid) {
+      return null;
+    }
+
+    return account;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+module.exports = localLogin;
 </code></pre>
         </article>
     </section>

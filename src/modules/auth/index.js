@@ -1,3 +1,7 @@
+/**
+ * @module Auth
+ */
+
 const logout = require('./logout');
 const ensureLoggedIn = require('./ensureLoggedIn');
 const localSignup = require('./localSignup');
