@@ -1,6 +1,18 @@
 const mailjet = require('../../config/mailjet');
 const {VALID_TYPE_USERS, USER} = require('../../config/config');
 
+/**
+ * @name sendConfirmationEmail
+ * @function
+ * @async
+ * @memberof module:Auth
+ * @description Sends an email to a user to activate their account
+ * @param {string} email User's email
+ * @param {string} type User's type
+ * @param {string} id User's id
+ * @param {string} token User's token
+ * @param {number} [SKIP_CONFIRMATION_EMAIL=0] If 1, the email is not sent
+ */
 const sendConfirmationEmail = async (email, type, id, token, SKIP_CONFIRMATION_EMAIL = 0) => {
   try {
     if (!VALID_TYPE_USERS.includes(type)) {

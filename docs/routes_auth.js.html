@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: routes/auth.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: routes/auth.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** Auth routes
+ * @module routes
+ */
+
+/**
+ * @type {object}
+ * @description Route /auth
+ * @const
+ * @namespace /auth
+ */
+const Auth = require('express').Router();
+
+const isEmail = require('isemail');
+const {USER} = require('../config/config');
+const setEntity = require('../passport/setEntity');
+
+const auth = require('../modules/auth/index');
+const server = require('../modules/server/index');
+
+/**
+ * @name Is authenticated?
+ * @description Returns if a user is authenticated or not
+ * @path {GET} /auth/is-authenticated
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @response {Object} 200: req.user
+ * @response {Object} 403:
+ * @response {string} message Error message
+ */
+Auth.get('/is-authenticated', auth.ensureLoggedIn(USER), (req, res) => {
+  res.status(200).json(req.user);
+});
+
+/**
+ * @name Log out
+ * @description Closes the user's session
+ * @path {GET} /auth/logout
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @response {Object} 200: 
+ * @response {string} message
+ */
+Auth.get('/logout', (req, res) => {
+  const loggedOut = auth.logout(req, USER);
+  if (loggedOut) {
+    return res.status(200).json({
+      message: 'Logged out successfully',
+    });
+  }
+  return res.status(200).json({
+    message: 'The account was not logged',
+  });
+});
+
+/**
+ * @name Confirm user account
+ * @description Confirms a user account
+ * @path {GET} /auth/confirm
+ * @memberof module:routes~/auth
+ * @body id {string} Id of the user
+ * @body token {string} Token of the user
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200: Entity
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
+Auth.post('/confirm', async (req, res) => {
+  try {
+    const {id, token} = req.body;
+
+    if (!id || !token) {
+      return res.status(400).json({
+        message: 'The id and the token are required',
+      });
+    }
+
+    const user = await auth.confirmUser(id, token, USER);
+
+    if (!user) {
+      return res.status(400).json({
+        message: 'User not found',
+      });
+    }
+
+    const entity = setEntity(id, USER);
+
+    return req.login(entity, error => {
+      if (error) {
+        throw new Error(error);
+      }
+
+      return res.status(200).json(entity);
+    });
+  } catch (error) {
+    return server.sendError(error, res);
+  }
+});
+
+/**
+ * @name Login
+ * @description Creates a user session
+ * @path {GET} /auth/login
+ * @memberof module:routes~/auth
+ * @body email {string} User's email
+ * @body password {string} User's password
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200: Entity
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
+Auth.post('/login', async (req, res) => {
+  try {
+    const {email, password} = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: 'Email and password are required',
+      });
+    }
+
+    const user = await auth.localLogin(email, password, USER);
+
+    if (!user) {
+      return res.status(400).json({
+        message: 'Wrong credentials',
+      });
+    }
+
+    if (!user.confirmed) {
+      return res.status(400).json({
+        message: 'The account is not activated',
+      });
+    }
+    const entity = setEntity(user.id, USER);
+
+    return req.login(entity, error => {
+      if (error) {
+        throw new Error(error);
+      }
+
+      return res.status(200).json(entity);
+    });
+  } catch (error) {
+    return server.sendError(error, res);
+  }
+});
+
+/**
+ * @name Signup
+ * @description Creates a user account
+ * @body email {string} Email of the user
+ * @body password {string} Password of the user
+ * @path {GET} /auth/signup
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200: Entity
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
+Auth.post('/signup', async (req, res) => {
+  try {
+    const {email, password} = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: 'The email and the password are required',
+      });
+    }
+    const parsedEmail = email.trim();
+
+    if (!isEmail.validate(parsedEmail)) {
+      return res.status(400).json({
+        message: 'The email is not valid',
+      });
+    }
+    const additionalInfo = {
+      SKIP_CONFIRMATION_EMAIL: process.env.SKIP_CONFIRMATION_EMAIL,
+    };
+
+    const user = await auth.localSignup(email, password, additionalInfo, USER);
+
+    if (!user) {
+      return res.status(400).json({
+        message: 'Email already exists',
+      });
+    }
+
+    const entity = setEntity(user.id, USER);
+
+    if (!+process.env.REQUIRE_EMAIL_CONFIRMATION) {
+      return req.login(entity, error => {
+        if (error) {
+          server.sendError(error, res);
+        }
+
+        return res.status(200).json(entity);
+      });
+    }
+
+    return res.status(200).json(entity);
+  } catch (error) {
+    return server.sendError(error, res);
+  }
+});
+
+/**
+ * @name Send recovery email
+ * @body email {string} Email of the user to request a password change
+ * @description Sends a recovery password email
+ * @path {GET} /auth/send-recovery-email
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200:
+ * @response {string} message Success message
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
+Auth.post('/send-recovery-email', async (req, res) => {
+  try {
+    const {email} = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: 'The email is required',
+      });
+    }
+
+    const parsedEmail = email.trim();
+    if (!isEmail.validate(parsedEmail)) {
+      return res.status(400).json({
+        message: 'The email is not valid',
+      });
+    }
+
+    const options = {
+      SKIP_RESET_PASSWORD_EMAIL: process.env.SKIP_RESET_PASSWORD_EMAIL,
+    };
+    const sended = await auth.sendPasswordRecoveryEmail(parsedEmail, USER, options);
+
+    if (!sended) {
+      return res.status(400).json({
+        message: 'The email does not exist',
+      });
+    }
+
+    return res.status(200).json({
+      messsage: 'Email sent successfully',
+    });
+  } catch (error) {
+    return server.sendError(error, res);
+  }
+});
+
+/**
+ * @name Reset password
+ * @body id {string} User id
+ * @body token {string} User token
+ * @body password {string} User password
+ * @body confirmPassword {string} Confirmation of the password
+ * @description Resets a user password
+ * @path {GET} /auth/reset-password
+ * @memberof module:routes~/auth
+ * @code {200} Request success
+ * @code {403} Access denied
+ * @code {400} Bad request
+ * @response {Object} 200:
+ * @response {string} message Success message
+ * @response {Object} 403:
+ * @response {string} message Error message
+ * @response {Object} 400:
+ * @response {string} message Error message
+ */
+Auth.post('/reset-password', async (req, res) => {
+  try {
+    const {id, token, password, confirmPassword} = req.body;
+
+    if (!id || !token || !password || !confirmPassword || password !== confirmPassword) {
+      return res.status(400).json({
+        message:
+          'The id, the token, the password and the confirmation of the password are required. Also, the password and the confirmation of the password must be the same',
+      });
+    }
+
+    const isReset = await auth.resetPassword(id, token, password, USER);
+
+    if (!isReset) {
+      return res.status(400).json({
+        message: 'The token is not correct or the user does not exist',
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Reseted password successfully',
+    });
+  } catch (error) {
+    return server.sendError(error, res);
+  }
+});
+
+module.exports = Auth;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Auth.html">Auth</a></li><li><a href="module-routes.html">routes</a></li><li><a href="module-Server.html">Server</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-routes-_.html">/</a></li><li><a href="module-routes-_auth.html">/auth</a></li></ul><h3>Global</h3><ul><li><a href="global.html#port">port</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 30 2020 16:21:03 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

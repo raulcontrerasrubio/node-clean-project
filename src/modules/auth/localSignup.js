@@ -4,6 +4,17 @@ const {VALID_TYPE_USERS, USER, PASSWORD_SALT} = require('../../config/config');
 const {User} = require('../../database/models');
 const sendConfirmationEmail = require('./sendConfirmationEmail');
 
+/**
+ * @name localSignup
+ * @function
+ * @async
+ * @memberof module:Auth
+ * @description Creates an user account
+ * @param {string} email User's email
+ * @param {string} password User's password
+ * @param {object} additionalInfo Additional information
+ * @param {string} type User's type
+ */
 const localSignup = async (email, password, additionalInfo, type) => {
   try {
     if (!VALID_TYPE_USERS.includes(type)) {

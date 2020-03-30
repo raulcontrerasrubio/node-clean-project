@@ -3,6 +3,18 @@ const bcrypt = require('bcryptjs');
 const {User} = require('../../database/models');
 const {USER, PASSWORD_SALT} = require('../../config/config');
 
+/**
+ * @name resetPassword
+ * @function
+ * @async
+ * @memberof module:Auth
+ * @description Changes the user password
+ * @param {string} id User's email
+ * @param {string} token User's token
+ * @param {string} password User's new password
+ * @param {string} confirmPassword User's new password confirmation
+ * @param {string} type User's type
+ */
 const resetPassword = async (id, token, password, type) => {
   try {
     if (!id || !token || !password) {

@@ -2,6 +2,17 @@ const mailjet = require('../../config/mailjet');
 const {User} = require('../../database/models');
 const {USER} = require('../../config/config');
 
+/**
+ * @name sendPasswordRecoveryEmail
+ * @function
+ * @async
+ * @memberof module:Auth
+ * @description Sends an email to a user to reset their password
+ * @param {string} email User email
+ * @param {string} type User type
+ * @param {object} [options={}] Additional config options
+ * @param {number} [options.SKIP_RESET_PASSWORD_EMAIL] If 1, the email is not sent
+ */
 const sendPasswordRecoveryEmail = async (email, type, options = {}) => {
   try {
     const {SKIP_RESET_PASSWORD_EMAIL} = options;

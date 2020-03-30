@@ -62,7 +62,6 @@ passport.use('user-local', userStrategy);
 /**
  * ROUTES
  */
-
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 

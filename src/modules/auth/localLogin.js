@@ -2,6 +2,16 @@ const bcrypt = require('bcryptjs');
 const {VALID_TYPE_USERS, USER} = require('../../config/config');
 const {User} = require('../../database/models');
 
+/**
+ * @name localLogin
+ * @function
+ * @async
+ * @memberof module:Auth
+ * @description Initializes a user's session
+ * @param {string} email User's email
+ * @param {string} password User's password
+ * @param {string} type User's type
+ */
 const localLogin = async (email, password, type) => {
   try {
     if (!VALID_TYPE_USERS.includes(type)) {
